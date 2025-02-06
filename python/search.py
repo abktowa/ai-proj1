@@ -138,6 +138,10 @@ def breadth_first_search(problem):
 	# Add start node
 	start = Node(problem.initial)
 	queue.append(start)
+	# Check if it's the goal
+	if problem.goal_test(start):
+		return (start, nodes_visited+1)
+	
 
 	while queue:
 		current = queue.popleft()
@@ -146,15 +150,15 @@ def breadth_first_search(problem):
 			# Visit
 			visited.add(current.id)
 			nodes_visited += 1
-			# Check if we found the solution
-			if problem.goal_test(current):
-				return (current, nodes_visited)
 			
 			# Insert neighbors
 			neighbors = current.expand()
 			for neighbor in neighbors:
-				# If not visited(neighbor):
-				queue.append(neighbor)
+				if neighbor.id not in visited:
+					# Check if we found the solution
+					if problem.goal_test(current):
+						return (current, nodes_visited+1)
+					queue.append(neighbor)
 		
 	
 def depth_first_search(problem):
