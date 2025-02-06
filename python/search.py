@@ -129,39 +129,61 @@ class Node:
 
 '''DO NOT MODIFY THE HEADERS OF ANY OF THESE FUNCTIONS'''
 def breadth_first_search(problem):
-	nodes_visited = 0
-	start = Node(problem.initial)
-	stack = deque()
-	stack.append(start)
-
-	while stack:
-		current = stack.pop()
-		nodes_visited += 1
-		# Check if we found the solution
-		if problem.goal_test(current):
-			return (current, nodes_visited)
-		# Insert neighbors
-		neighbors = current.expand
-		for neighbor in neighbors:
-			stack.append(neighbor)
-		
-	
-def depth_first_search(problem):
-	nodes_visited = 0
-	start = Node(problem.initial)
+	"Returns a tuple with the goal Node followed by an Integer with the amount of nodes visited"
+	# Setup
 	queue = deque()
+	visited = set()
+	nodes_visited = 0
+
+	# Add start node
+	start = Node(problem.initial)
 	queue.append(start)
 
 	while queue:
 		current = queue.popleft()
-		nodes_visited += 1
-		# Check if we found the solution
-		if problem.goal_test(current):
-			return (current, nodes_visited)
-		# Insert neighbors
-		neighbors = current.expand
-		for neighbor in neighbors:
-			queue.append(neighbor)
+
+		if current.id not in visited:
+			# Visit
+			visited.add(current.id)
+			nodes_visited += 1
+			# Check if we found the solution
+			if problem.goal_test(current):
+				return (current, nodes_visited)
+			
+			# Insert neighbors
+			neighbors = current.expand()
+			for neighbor in neighbors:
+				# If not visited(neighbor):
+				queue.append(neighbor)
+		
+	
+def depth_first_search(problem):
+	"Returns a tuple with the goal Node followed by an Integer with the amount of nodes visited"
+	# Setup
+	stack = deque()
+	visited = set()
+	nodes_visited = 0
+
+	# Add start node
+	start = Node(problem.initial)
+	stack.append(start)
+
+	while stack:
+		current = stack.pop()
+
+		if current.id not in visited:
+			# Visit
+			visited.add(current.id)
+			nodes_visited += 1
+			# Check if we found the solution
+			if problem.goal_test(current):
+				return (current, nodes_visited)
+			
+			# Insert neighbors
+			neighbors = current.expand()
+			for neighbor in neighbors:
+				if neighbor.id not in visited:
+					stack.append(neighbor)
 
 def uniform_cost_search(problem):
 	'''YOUR CODE HERE'''
@@ -176,15 +198,14 @@ def astar_search(problem):
 #______________________________________________________________________________
 
 ## Output
-def print_solution(node):
-
-	print("Total cost: "+str(node.path_cost))
-	print("Number of search nodes visited: ")
+def print_solution(solution):
+	"The paramater is a tuple with the goal Node followed by an integer with the amount of nodes visited"
+	print("Total cost: "+str(solution[0].path_cost))
+	print("Number of search nodes visited: "+str(solution[1]))
 	print("Final path: ")
-	print_station_path(node)
+	print_station_path(solution[0])
 
 def print_station_path(node):
-
 	stack = deque()
 
 	while node.parent:
@@ -209,15 +230,16 @@ def main():
 
 	if arg1 == "eight":
 		# Prepare the eight number puzzle
+		# Prepare problem
+		# problem = Problem()
 		pass
 
 	else:
-
 		# Prepare subway search
 
 		# Take more input
 		goal = sys.argv[4] # the destination subway stop
-
+		
 		# Get distance if it was provided
 		if len(sys.argv) > 5:
 			distance = sys.argv[5]
@@ -225,12 +247,14 @@ def main():
 			distance = 0
 
 		# Prepare problem
-		# problem = 
+		# problem = Problem()
 
 	if algorithm == "bfs":
 		print("Running BFS")
+		print_solution(breadth_first_search(problem))
 	elif algorithm == "dfs":
 		print("Running DFS")
+		print_solution(depth_first_search(problem))
 	elif algorithm == "ucs":
 		print("Running Uniformed Cost Search.")
 	elif algorithm == "astar":
