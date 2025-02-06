@@ -18,6 +18,7 @@ then create problem instances and solve them with calls to the various search
 functions."""
 
 import sys
+from collections import deque
 
 #______________________________________________________________________________
 
@@ -127,14 +128,40 @@ class Node:
 ## Uninformed Search algorithms
 
 '''DO NOT MODIFY THE HEADERS OF ANY OF THESE FUNCTIONS'''
-
 def breadth_first_search(problem):
-	'''YOUR CODE HERE'''
-	pass
+	nodes_visited = 0
+	start = Node(problem.initial)
+	stack = deque()
+	stack.append(start)
+
+	while stack:
+		current = stack.pop()
+		nodes_visited += 1
+		# Check if we found the solution
+		if problem.goal_test(current):
+			return (current, nodes_visited)
+		# Insert neighbors
+		neighbors = current.expand
+		for neighbor in neighbors:
+			stack.append(neighbor)
+		
 	
 def depth_first_search(problem):
-	'''YOUR CODE HERE'''
-	pass
+	nodes_visited = 0
+	start = Node(problem.initial)
+	queue = deque()
+	queue.append(start)
+
+	while queue:
+		current = queue.popleft()
+		nodes_visited += 1
+		# Check if we found the solution
+		if problem.goal_test(current):
+			return (current, nodes_visited)
+		# Insert neighbors
+		neighbors = current.expand
+		for neighbor in neighbors:
+			queue.append(neighbor)
 
 def uniform_cost_search(problem):
 	'''YOUR CODE HERE'''
@@ -147,12 +174,68 @@ def astar_search(problem):
 	pass
 
 #______________________________________________________________________________
+
+## Output
+def print_solution(node):
+
+	print("Total cost: "+str(node.path_cost))
+	print("Number of search nodes visited: ")
+	print("Final path: ")
+	print_station_path(node)
+
+def print_station_path(node):
+
+	stack = deque()
+
+	while node.parent:
+		stack.append(node.state)
+		node = node.parent
+
+	while stack:
+		print(stack.pop())
+
+
 ## Main
 
 def main():
-	'''REPLACE THIS CODE WITH CODE THAT RUNS THE PROGRAM SPECIFIED IN THE COMMAND ARGUMENTS'''
 
+	# For debugging
 	print(sys.argv) # Prints the command line arguments. Note that the 0th element is the name of the file (search.py).
-	
+
+	# Take input
+	arg1 = sys.argv[1] # Options are "eight", "boston", and "london"
+	algorithm = sys.argv[2] # Options are "dfs", "bfs", ucs, and "astar"
+	intial = sys.argv[3] # Either the starting subway stop, or the starting position of the number tiles
+
+	if arg1 == "eight":
+		# Prepare the eight number puzzle
+		pass
+
+	else:
+
+		# Prepare subway search
+
+		# Take more input
+		goal = sys.argv[4] # the destination subway stop
+
+		# Get distance if it was provided
+		if len(sys.argv) > 5:
+			distance = sys.argv[5]
+		else: 
+			distance = 0
+
+		# Prepare problem
+		# problem = 
+
+	if algorithm == "bfs":
+		print("Running BFS")
+	elif algorithm == "dfs":
+		print("Running DFS")
+	elif algorithm == "ucs":
+		print("Running Uniformed Cost Search.")
+	elif algorithm == "astar":
+		print("Running A*")
+	else:
+		print(f"Unrecognized algorithm: {algorithm}")
 
 main()
