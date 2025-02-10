@@ -1,5 +1,6 @@
 import math
 import csv
+import search
 
 class Station:
 	def __init__(self, id, name, lat, long):
@@ -116,7 +117,7 @@ class SubwayMap:
 		"""DO NOT USE -- Used by the build_map() functions to create the maps"""
 		link = Link(u, v, weight, line)
 		self.links[u].append( (v, link) )
-		self.links[v].append( (u, link) )
+		self.a[v].append( (u, link) )
 		
 def straight_line_distance(station1, station2):
 	"""Calculate the straight line distance (in km) between two subway stations.
@@ -201,3 +202,5 @@ def build_map(station_file, link_file):
 				new_map.insert_link(station1, station2, distance_km, route)
 	
 	return new_map
+
+
