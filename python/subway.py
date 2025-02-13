@@ -151,8 +151,8 @@ def build_boston_map():
 	
 def build_london_map():
 	"""Returns a SubwayMap object representing the London Underground map"""
-	london_station_file = "../../data/london_stations.csv"
-	london_link_file = "../../data/london_links.csv"
+	london_station_file = "data/london_stations.csv"
+	london_link_file = "data/london_links.csv"
 	
 	return build_map(london_station_file, london_link_file)
 	
