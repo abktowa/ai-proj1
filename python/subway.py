@@ -1,6 +1,5 @@
 import math
 import csv
-import search
 
 class Station:
 	def __init__(self, id, name, lat, long):
@@ -117,7 +116,7 @@ class SubwayMap:
 		"""DO NOT USE -- Used by the build_map() functions to create the maps"""
 		link = Link(u, v, weight, line)
 		self.links[u].append( (v, link) )
-		self.a[v].append( (u, link) )
+		self.links[v].append( (u, link) )
 		
 def straight_line_distance(station1, station2):
 	"""Calculate the straight line distance (in km) between two subway stations.
@@ -145,15 +144,15 @@ def straight_line_distance(station1, station2):
 
 def build_boston_map():
 	"""Returns a SubwayMap object representing the Boston T map"""
-	boston_station_file = "../data/boston_stations.csv"
-	boston_link_file = "../data/boston_links.csv"
+	boston_station_file = "data/boston_stations.csv"
+	boston_link_file = "data/boston_links.csv"
 	
 	return build_map(boston_station_file, boston_link_file)
 	
 def build_london_map():
 	"""Returns a SubwayMap object representing the London Underground map"""
-	london_station_file = "../data/london_stations.csv"
-	london_link_file = "../data/london_links.csv"
+	london_station_file = "../../data/london_stations.csv"
+	london_link_file = "../../data/london_links.csv"
 	
 	return build_map(london_station_file, london_link_file)
 	

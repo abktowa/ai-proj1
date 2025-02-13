@@ -19,6 +19,7 @@ functions."""
 
 import sys
 from collections import deque
+import subway
 
 #______________________________________________________________________________
 
@@ -70,7 +71,7 @@ class subway_problem(Problem): #Sub-Class of Problem
 		self.subMap = subMap
 	
 	def successor(self, state):
-		self.subMap.adjacent_stations(state)
+		return self.subMap.adjacent_stations(state)
 	
 	def goal_test(self, state):
 		return state == self.goal
@@ -80,7 +81,7 @@ class subway_problem(Problem): #Sub-Class of Problem
 		return c + chosenLinks.get_distance()
 
 	def h(self, node):
-		subMap.straight_line_distance(node, goal)
+		return self.subMap.straight_line_distance(node, self.goal)
 
 #______________________________________________________________________________
 '''DO NOT MODIFY THIS CLASS'''
@@ -242,14 +243,14 @@ def print_station_path(node):
 ## Main
 
 def main():
-
+	global cityMap
 	# For debugging
 	print(sys.argv) # Prints the command line arguments. Note that the 0th element is the name of the file (search.py).
 
 	# Take input
 	arg1 = sys.argv[1] # Options are "eight", "boston", and "london"
 	algorithm = sys.argv[2] # Options are "dfs", "bfs", ucs, and "astar"
-	intial = sys.argv[3] # Either the starting subway stop, or the starting position of the number tiles
+	initial = sys.argv[3] # Either the starting subway stop, or the starting position of the number tiles
 
 	if arg1 == "eight":
 		# Prepare the eight number puzzle
@@ -259,7 +260,10 @@ def main():
 
 	else:
 		# Prepare subway search
-
+		if arg1 == "boston":
+			cityMap = subway.build_boston_map()
+		elif arg1 == "london":
+			cityMap = subway.build_london_map()
 		# Take more input
 		goal = sys.argv[4] # the destination subway stop
 		
@@ -274,14 +278,16 @@ def main():
 
 	if algorithm == "bfs":
 		print("Running BFS")
-		print_solution(breadth_first_search(problem))
+		print_solution(breadth_first_search(subway_problem(initial, goal, cityMap)))
 	elif algorithm == "dfs":
 		print("Running DFS")
-		print_solution(depth_first_search(problem))
+		print_solution(depth_first_search(subway_problem(initial, goal, cityMap)))
 	elif algorithm == "ucs":
 		print("Running Uniformed Cost Search.")
+		print_solution(uniform_cost_search(subway_problem(initial, goal, cityMap)))
 	elif algorithm == "astar":
 		print("Running A*")
+		print_solution(astar_search(subway_problem(initial, goal, cityMap)))
 	else:
 		print(f"Unrecognized algorithm: {algorithm}")
 
