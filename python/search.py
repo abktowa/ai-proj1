@@ -148,7 +148,8 @@ class Node:
 
 '''DO NOT MODIFY THE HEADERS OF ANY OF THESE FUNCTIONS'''
 def breadth_first_search(problem):
-	"Returns a tuple with the goal Node followed by an Integer with the amount of nodes visited"
+	"""Returns a tuple with the goal Node followed by an Integer with the amount of nodes visited
+	(Returns None if a solution isn't found)"""
 	# Setup
 	queue = deque()
 	visited = set()
@@ -178,10 +179,13 @@ def breadth_first_search(problem):
 					if problem.goal_test(current):
 						return (current, nodes_visited+1)
 					queue.append(neighbor)
+
+	return None
 		
 	
 def depth_first_search(problem):
-	"Returns a tuple with the goal Node followed by an Integer with the amount of nodes visited"
+	"""Returns a tuple with the goal Node followed by an Integer with the amount of nodes visited
+	(Returns None if a solution isn't found)"""
 	# Setup
 	stack = deque()
 	visited = set()
@@ -207,6 +211,8 @@ def depth_first_search(problem):
 			for neighbor in neighbors:
 				if neighbor.id not in visited:
 					stack.append(neighbor)
+
+	return None
 
 def uniform_cost_search(problem):
 	'''YOUR CODE HERE'''
