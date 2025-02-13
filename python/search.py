@@ -149,7 +149,8 @@ class Node:
 
 '''DO NOT MODIFY THE HEADERS OF ANY OF THESE FUNCTIONS'''
 def breadth_first_search(problem):
-	"Returns a tuple with the goal Node followed by an Integer with the amount of nodes visited"
+	"""Returns a tuple with the goal Node followed by an Integer with the amount of nodes visited
+	(Returns None if a solution isn't found)"""
 	# Setup
 	queue = deque()
 	visited = set()
@@ -179,10 +180,13 @@ def breadth_first_search(problem):
 					if problem.goal_test(current):
 						return (current, nodes_visited+1)
 					queue.append(neighbor)
+
+	return None
 		
 	
 def depth_first_search(problem):
-	"Returns a tuple with the goal Node followed by an Integer with the amount of nodes visited"
+	"""Returns a tuple with the goal Node followed by an Integer with the amount of nodes visited
+	(Returns None if a solution isn't found)"""
 	# Setup
 	stack = deque()
 	visited = set()
@@ -209,9 +213,38 @@ def depth_first_search(problem):
 				if neighbor.id not in visited:
 					stack.append(neighbor)
 
+	return None
+
 def uniform_cost_search(problem):
-	'''YOUR CODE HERE'''
-	pass
+	queue = deque()
+	visited = set()
+	nodes_visited = 0
+
+	agg_cost = {}
+
+	start = Node(problem.initial)
+	queue.append(start)
+	agg_cost[start.id] = start.path_cost
+
+	if problem.goal_test(start.state):
+		return(start, 1)
+	
+	while queue: 
+		current = queue.popleft()
+	
+		if current.id not in visited:
+			visited.add(current.id)
+			nodes_visited += 1
+			
+			# Insert neighbors
+			neighbors = current.expand()
+			for neighbor in neighbors:
+				if neighbor.id not in visited and neighbor.path_cost < agg_cost.get(neighbor.id, float('inf)')) :
+					# Check if we found the solution
+					if problem.goal_test(current):
+						return (current, nodes_visited+1)
+					agg_cost[neighbor.id] = neighbor.path_cost
+					queue.append(neighbor)
 #______________________________________________________________________________
 # Informed (Heuristic) Search
 
