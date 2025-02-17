@@ -288,8 +288,10 @@ def main():
 
 	if arg1 == "eight":
 		# Prepare the eight number puzzle
+
 		# Prepare problem
-		# problem = Problem()
+		# problem = puzzle_problem()
+		
 		pass
 
 	else:
@@ -308,20 +310,20 @@ def main():
 			distance = 0
 
 		# Prepare problem
-		# problem = Problem()
+		problem = subway_problem(initial, goal, cityMap)
 
 	if algorithm == "bfs":
 		print("Running BFS")
-		print_solution(breadth_first_search(subway_problem(initial, goal, cityMap)))
+		print_solution(breadth_first_search(problem))
 	elif algorithm == "dfs":
 		print("Running DFS")
-		print_solution(depth_first_search(subway_problem(initial, goal, cityMap)))
+		print_solution(depth_first_search(problem))
 	elif algorithm == "ucs":
 		print("Running Uniformed Cost Search.")
-		print_solution(uniform_cost_search(subway_problem(initial, goal, cityMap)))
+		print_solution(uniform_cost_search(problem))
 	elif algorithm == "astar":
 		print("Running A*")
-		print_solution(astar_search(subway_problem(initial, goal, cityMap)))
+		print_solution(astar_search(problem))
 	else:
 		print(f"Unrecognized algorithm: {algorithm}")
 
