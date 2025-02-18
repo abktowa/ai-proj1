@@ -285,6 +285,8 @@ def main():
 	arg1 = sys.argv[1] # Options are "eight", "boston", and "london"
 	algorithm = sys.argv[2] # Options are "dfs", "bfs", ucs, and "astar"
 	initial = sys.argv[3] # Either the starting subway stop, or the starting position of the number tiles
+	# Take more input
+	goal = sys.argv[4] # the destination subway stop
 
 	if arg1 == "eight":
 		# Prepare the eight number puzzle
@@ -300,9 +302,9 @@ def main():
 			cityMap = subway.build_boston_map()
 		elif arg1 == "london":
 			cityMap = subway.build_london_map()
-		# Take more input
-		goal = sys.argv[4] # the destination subway stop
 		
+		initialCity = cityMap.get_station_by_name(initial)
+		goalCity = cityMap.get_station_by_name(goal)
 		# Get distance if it was provided
 		if len(sys.argv) > 5:
 			distance = sys.argv[5]
@@ -310,7 +312,7 @@ def main():
 			distance = 0
 
 		# Prepare problem
-		problem = subway_problem(initial, goal, cityMap)
+		problem = subway_problem(initialCity, goalCity, cityMap)
 
 	if algorithm == "bfs":
 		print("Running BFS")
