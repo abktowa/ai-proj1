@@ -104,7 +104,7 @@ class SubwayMap:
 		"""
 		adj = self.links[v]
 		for pair in adj:
-			yield pair[0]
+			yield (pair[1], pair[0])
 		
 	def insert_station(self, id, name, lat, long):
 		"""DO NOT USE -- Used by the build_map() functions to create the maps"""

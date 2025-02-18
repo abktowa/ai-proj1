@@ -78,7 +78,7 @@ class subway_problem(Problem): #Sub-Class of Problem
 
 	def path_cost(self, c, state1, action, state2):
 		chosenLinks = self.subMap.get_links_between(state1, state2)
-		return c + chosenLinks.get_distance()
+		return c + next(chosenLinks).get_distance()
 
 	def h(self, node):
 		return self.subMap.straight_line_distance(node, self.goal)
