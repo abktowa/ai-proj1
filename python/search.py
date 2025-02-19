@@ -291,13 +291,13 @@ def uniform_cost_search(problem):
 			return (current_node, nodes_visited)
 		
 		# Add the current node to our list of visited nodes
-		visited.add(current_node.id)
+		visited.add(current_node.state)
 
 		# Takes a look at neighboring nodes for current node
 		neighbors = current_node.expand(problem)
 		for neighbor in neighbors:
 			# Check to see if we haven't yet visited node
-			if neighbor.id not in visited:
+			if neighbor.state not in visited:
 				# Grabs our best cost so far
 				best_so_far = opt_cost.get(neighbor.state, float('inf'))
 				# Grabs the cost for going to the next state from the expanded nodes
