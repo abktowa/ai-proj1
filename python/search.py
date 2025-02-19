@@ -299,14 +299,16 @@ def print_solution(solution):
 	print("Total cost: "+str(solution[0].path_cost))
 	print("Number of search nodes visited: "+str(solution[1]))
 	print("Final path: ")
-	print_station_path(solution[0])
+	print_path(solution[0])
 
-def print_station_path(node):
+def print_path(node):
 	stack = deque()
 
 	while node.parent:
 		stack.append(node.state)
 		node = node.parent
+	
+	stack.append(node.state)
 
 	while stack:
 		print(stack.pop())
