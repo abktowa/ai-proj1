@@ -266,37 +266,48 @@ def depth_first_search(problem):
 	return None
 
 def uniform_cost_search(problem):
-	# Initializing 
+	# Setup
 	pqueue = []
 	visited = set()
 	nodes_visited = 0
 	opt_cost = {}
 
+	# Initializing our starting node, priority queue tuple and path of best cost 
 	start = Node(problem.initial)
 	heapq.heappush(pqueue, (start.path_cost, start))
 	opt_cost[start.state] = start.path_cost
 
 	while pqueue: 
+		# Set our current node to the node with the least cost with a pop
 		_, current_node = heapq.heappop(pqueue)
 		nodes_visited += 1
 
+		# Check to see if path cost of current node is larger than our current best known cost, skips it if so
 		if current_node.path_cost > opt_cost.get(current_node.state, float('inf')):
 			continue
 
+		# Goal state check
 		if problem.goal_test(current_node.state):
 			return (current_node, nodes_visited)
 		
+		# Add the current node to our list of visited nodes
 		visited.add(current_node.id)
 
+		# Takes a look at neighboring nodes for current node
 		neighbors = current_node.expand(problem)
 		for neighbor in neighbors:
+			# Check to see if we haven't yet visited node
 			if neighbor.id not in visited:
-				old_cost = opt_cost.get(neighbor.state, float('inf'))
+				# Grabs our best cost so far
+				best_so_far = opt_cost.get(neighbor.state, float('inf'))
+				# Grabs the cost for going to the next state from the expanded nodes
 				new_cost = neighbor.path_cost
-				if new_cost < old_cost:
+				# If the path is cheaper we add this to the priority queue for exploration
+				if new_cost < best_so_far:
 					opt_cost[neighbor.state] = new_cost
 					heapq.heappush(pqueue, (new_cost, neighbor))
 
+	# In case we finish checking and there is just no goal state to return
 	return None
 #______________________________________________________________________________
 # Informed (Heuristic) Search
