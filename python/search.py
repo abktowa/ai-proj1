@@ -224,24 +224,20 @@ def depth_first_search(problem):
 	return None
 
 def uniform_cost_search(problem):
-	queue = deque()
+	queue = []
 	visited = set()
 	nodes_visited = 0
-
 	opt_cost = {}
 
 	start = Node(problem.initial)
-	queue.append(start)
+	heapq.heappush(queue, (start.path_cost, start))
 	opt_cost[start.state] = start.path_cost
 
 	if problem.goal_test(start.state):
-		return(start, nodes_visited+1)
+		return(start, nodes_visited + 1)
 	
 	while queue: 
-		cheapest_node = min(((node.path_cost, node) for node in queue))
-		current_node = cheapest_node[1]
-		queue.remove(current_node)
-		
+		_, current_node = heapq.heappop(queue)
 		nodes_visited += 1
 
 		if current_node.path_cost > opt_cost.get(current_node.state, float('inf')):
@@ -250,17 +246,16 @@ def uniform_cost_search(problem):
 		if problem.goal_test(current_node.state):
 			return (current_node, nodes_visited)
 		
-		visited.add(current_node.id)
-	
-		neighbors = current_node.expand(problem)
-		neighbors = current_node.expand(problem)
+		visited.add(current_node.state)
 
+		neighbors = current_node.expand(problem)
 		for neighbor in neighbors:
 			if neighbor.state not in visited:
 				old_cost = opt_cost.get(neighbor.state, float('inf'))
-				if neighbor.path_cost < old_cost:
-					opt_cost[neighbor.state] = neighbor.path_cost
-					queue.append(neighbor)
+				new_cost = neighbor.path_cost
+				if new_cost < old_cost:
+					opt_cost[neighbor.state] = new_cost
+					heapq.heappush(queue, (new_cost, neighbor))
 
 	return None
 #______________________________________________________________________________
