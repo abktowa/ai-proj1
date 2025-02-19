@@ -20,6 +20,8 @@ functions."""
 import sys
 from collections import deque
 import subway
+import heapq
+from subway import straight_line_distance
 import math
 
 #______________________________________________________________________________
@@ -82,9 +84,8 @@ class subway_problem(Problem): #Sub-Class of Problem
 		return c + next(chosenLinks).get_distance()
 
 	def h(self, node):
-		return self.subMap.straight_line_distance(node, self.goal)
+		return straight_line_distance(node.state, self.goal)  # Use the standalone function
 	
-
 class puzzle_problem(Problem): #Sub-Class of Problem
 	def __init__(self, initial):
 		Problem.__init__(self, initial, "0123456789")
@@ -214,13 +215,12 @@ def breadth_first_search(problem):
 	if problem.goal_test(start.state):
 		return (start, nodes_visited+1)
 	
-
 	while queue:
 		current = queue.popleft()
 
-		if current.id not in visited:
+		if current.state not in visited:
 			# Visit
-			visited.add(current.id)
+			visited.add(current.state)
 			nodes_visited += 1
 
 			if problem.goal_test(current.state):
@@ -229,7 +229,7 @@ def breadth_first_search(problem):
 			# Insert neighbors
 			neighbors = current.expand(problem)
 			for neighbor in neighbors:
-				if neighbor.id not in visited:
+				if neighbor.state not in visited:
 					queue.append(neighbor)
 
 	return None
@@ -247,61 +247,96 @@ def depth_first_search(problem):
 	start = Node(problem.initial)
 	stack.append(start)
 
+	# Check if it's the goal
+	if problem.goal_test(start.state):
+		return (start, nodes_visited+1)
+
 	while stack:
 		current = stack.pop()
 
-		if current.id not in visited:
+		if current.state not in visited:
 			# Visit
-			visited.add(current.id)
+			visited.add(current.state)
 			nodes_visited += 1
 			# Check if we found the solution
-			if problem.goal_test(current):
+			if problem.goal_test(current.state):
 				return (current, nodes_visited)
 			
 			# Insert neighbors
 			neighbors = current.expand(problem)
 			for neighbor in neighbors:
-				if neighbor.id not in visited:
+				if neighbor.state not in visited:
 					stack.append(neighbor)
 
 	return None
 
 def uniform_cost_search(problem):
-	queue = deque()
+	# Initializing 
+	queue = []
 	visited = set()
 	nodes_visited = 0
-
-	agg_cost = {}
+	opt_cost = {}
 
 	start = Node(problem.initial)
-	queue.append(start)
-	agg_cost[start.id] = start.path_cost
+	heapq.heappush(queue, (start.path_cost, start))
+	opt_cost[start.state] = start.path_cost
 
-	if problem.goal_test(start.state):
-		return(start, 1)
-	
 	while queue: 
-		current = queue.popleft()
-	
-		if current.id not in visited:
-			visited.add(current.id)
-			nodes_visited += 1
-			
-			# Insert neighbors
-			neighbors = current.expand()
-			for neighbor in neighbors:
-				if neighbor.id not in visited and neighbor.path_cost < agg_cost.get(neighbor.id, float('inf)')) :
-					# Check if we found the solution
-					if problem.goal_test(current):
-						return (current, nodes_visited+1)
-					agg_cost[neighbor.id] = neighbor.path_cost
-					queue.append(neighbor)
+		_, current_node = heapq.heappop(queue)
+		nodes_visited += 1
+
+		if current_node.path_cost > opt_cost.get(current_node.state, float('inf')):
+			continue
+
+		if problem.goal_test(current_node.state):
+			return (current_node, nodes_visited)
+		
+		visited.add(current_node.id)
+
+		neighbors = current_node.expand(problem)
+		for neighbor in neighbors:
+			if neighbor.id not in visited:
+				old_cost = opt_cost.get(neighbor.state, float('inf'))
+				new_cost = neighbor.path_cost
+				if new_cost < old_cost:
+					opt_cost[neighbor.state] = new_cost
+					heapq.heappush(queue, (new_cost, neighbor))
+
+	return None
 #______________________________________________________________________________
 # Informed (Heuristic) Search
 
 def astar_search(problem):
-	'''YOUR CODE HERE'''
-	pass
+	queue = []
+	visited = set()
+	nodes_visited = 0
+	opt_cost = {}
+
+	start = Node(problem.initial)
+	heapq.heappush(queue, (start.path_cost + problem.h(start), start))  
+	opt_cost[start.state] = start.path_cost
+
+	while queue:
+		_, current_node = heapq.heappop(queue)  # Extract node with lowest f(n)
+		nodes_visited += 1
+
+		if current_node.state in visited:
+			continue
+
+		visited.add(current_node.state)
+
+		if problem.goal_test(current_node.state):
+			return (current_node, nodes_visited)
+
+		for neighbor in current_node.expand(problem):
+			if neighbor.state not in visited:
+				old_cost = opt_cost.get(neighbor.state, float('inf'))
+				if neighbor.path_cost < old_cost:
+					opt_cost[neighbor.state] = neighbor.path_cost
+					f_cost = neighbor.path_cost + problem.h(neighbor)  # Compute f(n)
+					heapq.heappush(queue, (f_cost, neighbor))
+
+	return None
 
 #______________________________________________________________________________
 
@@ -311,14 +346,16 @@ def print_solution(solution):
 	print("Total cost: "+str(solution[0].path_cost))
 	print("Number of search nodes visited: "+str(solution[1]))
 	print("Final path: ")
-	print_station_path(solution[0])
+	print_path(solution[0])
 
-def print_station_path(node):
+def print_path(node):
 	stack = deque()
 
 	while node.parent:
 		stack.append(node.state)
 		node = node.parent
+	
+	stack.append(node.state)
 
 	while stack:
 		print(stack.pop())
