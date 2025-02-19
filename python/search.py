@@ -20,6 +20,9 @@ functions."""
 import sys
 from collections import deque
 import subway
+import heapq
+from subway import straight_line_distance
+
 
 #______________________________________________________________________________
 
@@ -81,7 +84,8 @@ class subway_problem(Problem): #Sub-Class of Problem
 		return c + next(chosenLinks).get_distance()
 
 	def h(self, node):
-		return self.subMap.straight_line_distance(node, self.goal)
+   	 return straight_line_distance(node.state, self.goal)  # Use the standalone function
+
 
 #______________________________________________________________________________
 '''DO NOT MODIFY THIS CLASS'''
@@ -260,8 +264,39 @@ def uniform_cost_search(problem):
 # Informed (Heuristic) Search
 
 def astar_search(problem):
-	'''YOUR CODE HERE'''
-	pass
+	queue = []
+	visited = set()
+	nodes_visited = 0
+	opt_cost = {}
+
+	start = Node(problem.initial)
+	heapq.heappush(queue, (start.path_cost + problem.h(start), start))  
+	opt_cost[start.state] = start.path_cost
+
+	if problem.goal_test(start.state):
+		return (start, nodes_visited + 1)
+
+	while queue:
+		_, current_node = heapq.heappop(queue)  # Extract node with lowest f(n)
+		nodes_visited += 1
+
+		if current_node.state in visited:
+			continue
+
+		visited.add(current_node.state)
+
+		if problem.goal_test(current_node.state):
+			return (current_node, nodes_visited)
+
+		for neighbor in current_node.expand(problem):
+			if neighbor.state not in visited:
+				old_cost = opt_cost.get(neighbor.state, float('inf'))
+				if neighbor.path_cost < old_cost:
+					opt_cost[neighbor.state] = neighbor.path_cost
+					f_cost = neighbor.path_cost + problem.h(neighbor)  # Compute f(n)
+					heapq.heappush(queue, (f_cost, neighbor))
+
+	return None
 
 #______________________________________________________________________________
 
