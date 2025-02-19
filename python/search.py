@@ -20,6 +20,7 @@ functions."""
 import sys
 from collections import deque
 import subway
+import math
 
 #______________________________________________________________________________
 
@@ -82,6 +83,55 @@ class subway_problem(Problem): #Sub-Class of Problem
 
 	def h(self, node):
 		return self.subMap.straight_line_distance(node, self.goal)
+	
+
+class puzzle_problem(Problem): #Sub-Class of Problem
+	def __init__(self, initial):
+		Problem.__init__(self, initial, "0123456789")
+
+	def successor(self, state):
+		allOptions = []
+		allStates = []
+		emptySquare = state.index("0")
+		if emptySquare > 2:
+			allOptions.append(("Move Tile " + state[emptySquare - 3] + " down", emptySquare - 3))
+		if emptySquare < 6:
+			allOptions.append(("Move Tile " + state[emptySquare + 3] + " up", emptySquare + 3))
+		if emptySquare % 3 < 2:
+			allOptions.append(("Move Tile " + state[emptySquare + 1] + " left", emptySquare + 1))
+		if emptySquare % 3 > 0:
+			allOptions.append(("Move Tile " + state[emptySquare - 1] + " right", emptySquare - 1))
+
+		for i in range(len(allOptions)):
+			allStates.append(allOptions[i][0], self.movePiece(state, emptySquare, allOptions[i][1]))
+
+		return allStates
+	
+	def goal_test(self, state):
+		return state == self.goal
+	
+	def path_cost(self, c, state1, action, state2):
+		return c + 1
+			
+	def h(self,state):
+		heuristic = 0
+		for i in range(9):
+			heuristic += self.manhattan(state.index(str(i)), i, 3)
+		return heuristic
+			
+	def movePiece(self, state, emptyIndex, moveIndex):
+		newString = state
+		strList = list(newString)
+
+		strList[emptyIndex] = state[moveIndex]
+		strList[moveIndex] = 0
+
+		return "".join(strList)
+	
+	def manhattan(number1, number2, size): #Finds manhattan distance on a 3 by 3 grid
+		vertDist = abs(math.floor(number1/size) - math.floor(number2/size))
+		horDist = abs((number1 % size) - (number2 % size))
+		return vertDist + horDist
 
 #______________________________________________________________________________
 '''DO NOT MODIFY THIS CLASS'''
@@ -292,7 +342,7 @@ def main():
 		# Prepare the eight number puzzle
 
 		# Prepare problem
-		# problem = puzzle_problem()
+		problem = puzzle_problem(initial)
 		
 		pass
 
