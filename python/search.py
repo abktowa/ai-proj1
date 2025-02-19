@@ -222,14 +222,13 @@ def breadth_first_search(problem):
 			# Visit
 			visited.add(current.state)
 			nodes_visited += 1
-
-			if problem.goal_test(current.state):
-				return (current, nodes_visited)
 			
 			# Insert neighbors
 			neighbors = current.expand(problem)
 			for neighbor in neighbors:
 				if neighbor.state not in visited:
+					if problem.goal_test(current.state):
+						return (current, nodes_visited)
 					queue.append(neighbor)
 
 	return None
@@ -246,10 +245,6 @@ def depth_first_search(problem):
 	# Add start node
 	start = Node(problem.initial)
 	stack.append(start)
-
-	# Check if it's the goal
-	if problem.goal_test(start.state):
-		return (start, nodes_visited+1)
 
 	while stack:
 		current = stack.pop()
