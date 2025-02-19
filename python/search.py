@@ -171,9 +171,9 @@ def breadth_first_search(problem):
 	while queue:
 		current = queue.popleft()
 
-		if current.id not in visited:
+		if current.state not in visited:
 			# Visit
-			visited.add(current.id)
+			visited.add(current.state)
 			nodes_visited += 1
 
 			if problem.goal_test(current.state):
@@ -182,7 +182,7 @@ def breadth_first_search(problem):
 			# Insert neighbors
 			neighbors = current.expand(problem)
 			for neighbor in neighbors:
-				if neighbor.id not in visited:
+				if neighbor.state not in visited:
 					queue.append(neighbor)
 
 	return None
@@ -224,6 +224,7 @@ def depth_first_search(problem):
 	return None
 
 def uniform_cost_search(problem):
+	# Initializing 
 	queue = []
 	visited = set()
 	nodes_visited = 0
@@ -233,9 +234,6 @@ def uniform_cost_search(problem):
 	heapq.heappush(queue, (start.path_cost, start))
 	opt_cost[start.state] = start.path_cost
 
-	if problem.goal_test(start.state):
-		return(start, nodes_visited + 1)
-	
 	while queue: 
 		_, current_node = heapq.heappop(queue)
 		nodes_visited += 1
@@ -246,11 +244,11 @@ def uniform_cost_search(problem):
 		if problem.goal_test(current_node.state):
 			return (current_node, nodes_visited)
 		
-		visited.add(current_node.state)
+		visited.add(current_node.id)
 
 		neighbors = current_node.expand(problem)
 		for neighbor in neighbors:
-			if neighbor.state not in visited:
+			if neighbor.id not in visited:
 				old_cost = opt_cost.get(neighbor.state, float('inf'))
 				new_cost = neighbor.path_cost
 				if new_cost < old_cost:
@@ -270,9 +268,6 @@ def astar_search(problem):
 	start = Node(problem.initial)
 	heapq.heappush(queue, (start.path_cost + problem.h(start), start))  
 	opt_cost[start.state] = start.path_cost
-
-	if problem.goal_test(start.state):
-		return (start, nodes_visited + 1)
 
 	while queue:
 		_, current_node = heapq.heappop(queue)  # Extract node with lowest f(n)
