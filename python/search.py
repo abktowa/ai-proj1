@@ -272,17 +272,17 @@ def depth_first_search(problem):
 
 def uniform_cost_search(problem):
 	# Initializing 
-	queue = []
+	pqueue = []
 	visited = set()
 	nodes_visited = 0
 	opt_cost = {}
 
 	start = Node(problem.initial)
-	heapq.heappush(queue, (start.path_cost, start))
+	heapq.heappush(pqueue, (start.path_cost, start))
 	opt_cost[start.state] = start.path_cost
 
-	while queue: 
-		_, current_node = heapq.heappop(queue)
+	while pqueue: 
+		_, current_node = heapq.heappop(pqueue)
 		nodes_visited += 1
 
 		if current_node.path_cost > opt_cost.get(current_node.state, float('inf')):
@@ -300,7 +300,7 @@ def uniform_cost_search(problem):
 				new_cost = neighbor.path_cost
 				if new_cost < old_cost:
 					opt_cost[neighbor.state] = new_cost
-					heapq.heappush(queue, (new_cost, neighbor))
+					heapq.heappush(pqueue, (new_cost, neighbor))
 
 	return None
 #______________________________________________________________________________
