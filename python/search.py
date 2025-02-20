@@ -76,7 +76,12 @@ class subway_problem(Problem): #Sub-Class of Problem
 	def successor(self, state):
 		return self.subMap.adjacent_stations(state)
 	
-	def goal_test(self, state):
+	def goal_test(self, state, alt_goal=None):
+		# If an alt_goal is provided we check if the current state is the alt goal 
+		# (this is used in smart search)
+		if alt_goal is not None:
+			return state == alt_goal 
+			
 		return state == self.goal
 
 	def path_cost(self, c, state1, action, state2):
@@ -85,6 +90,15 @@ class subway_problem(Problem): #Sub-Class of Problem
 
 	def h(self, node):
 		return straight_line_distance(node.state, self.goal)  # Use the standalone function
+	
+	def get_closest_stations(self, d): # Returns all stations within distance d from the goal
+		for station in self.subMap.get_stations():
+			distance_to_goal = straight_line_distance(station, self.goal)
+			if distance_to_goal <= d:
+				if station.name == "Fenway":
+					print(str(station)+" has distance "+str(distance_to_goal))
+				yield station
+
 	
 class puzzle_problem(Problem): #Sub-Class of Problem
 	def __init__(self, initial):
@@ -108,7 +122,7 @@ class puzzle_problem(Problem): #Sub-Class of Problem
 
 		return allStates
 	
-	def goal_test(self, state):
+	def goal_test(self, state, alt_goal=None): # Other problems require the option for an alt_goal. Allowing it here as an arugument simplifies other code
 		return state == self.goal
 	
 	def path_cost(self, c, state1, action, state2):
@@ -194,12 +208,28 @@ class Node:
 	def __hash__(self):
 		return hash(self.id)
 
+#______________________________________________________________________________
+## Smart search function for the subway system. returns the closest station within the given distance from the goal
+def smart_search(problem, algorithm, distance):
+	possible_results = []
+
+	# Retrive all stations within the given distance from the goal
+	closest_stations = problem.get_closest_stations(distance) 
+
+	# Perform the algorithm on each of the retrieved station (passing in that station to be used for the goal test)
+	for station in closest_stations:
+		result = algorithm(problem, station)
+		if result != None: # Check that the station is reachable from the initial station
+			possible_results.append(result)
+			
+	# Return the station with the smallest path cost
+	return min(possible_results, key=lambda x: x[0].path_cost)
 
 #______________________________________________________________________________
 ## Uninformed Search algorithms
 
 '''DO NOT MODIFY THE HEADERS OF ANY OF THESE FUNCTIONS'''
-def breadth_first_search(problem):
+def breadth_first_search(problem, alt_goal=None):
 	"""Returns a tuple with the goal Node followed by an Integer with the amount of nodes visited
 	(Returns None if a solution isn't found)"""
 	# Setup
@@ -212,7 +242,7 @@ def breadth_first_search(problem):
 	queue.append(start)
 
 	# Check if it's the goal
-	if problem.goal_test(start.state):
+	if problem.goal_test(start.state, alt_goal):
 		return (start, 1)
 	
 	while queue:
@@ -227,13 +257,13 @@ def breadth_first_search(problem):
 			neighbors = current.expand(problem)
 			for neighbor in neighbors:
 				if neighbor.state not in visited:
-					if problem.goal_test(neighbor.state):
+					if problem.goal_test(neighbor.state, alt_goal):
 						return (neighbor, nodes_visited)
 					queue.append(neighbor)
 	return None
 		
 	
-def depth_first_search(problem):
+def depth_first_search(problem, alt_goal=None):
 	"""Returns a tuple with the goal Node followed by an Integer with the amount of nodes visited
 	(Returns None if a solution isn't found)"""
 	# Setup
@@ -253,7 +283,7 @@ def depth_first_search(problem):
 			visited.add(current.state)
 			nodes_visited += 1
 			# Check if we found the solution
-			if problem.goal_test(current.state):
+			if problem.goal_test(current.state, alt_goal):
 				return (current, nodes_visited)
 			
 			# Insert neighbors
@@ -264,7 +294,7 @@ def depth_first_search(problem):
 
 	return None
 
-def uniform_cost_search(problem):
+def uniform_cost_search(problem, alt_goal=None):
 	# Setup
 	pqueue = []
 	visited = set()
@@ -286,7 +316,7 @@ def uniform_cost_search(problem):
 			continue
 
 		# Goal state check
-		if problem.goal_test(current_node.state):
+		if problem.goal_test(current_node.state, alt_goal):
 			return (current_node, nodes_visited)
 		
 		# Add the current node to our list of visited nodes
@@ -311,7 +341,7 @@ def uniform_cost_search(problem):
 #______________________________________________________________________________
 # Informed (Heuristic) Search
 
-def astar_search(problem):
+def astar_search(problem, alt_goal=None):
 	queue = []
 	visited = set()
 	nodes_visited = 0
@@ -330,7 +360,7 @@ def astar_search(problem):
 
 		visited.add(current_node.state)
 
-		if problem.goal_test(current_node.state):
+		if problem.goal_test(current_node.state, alt_goal):
 			return (current_node, nodes_visited)
 
 		for neighbor in current_node.expand(problem):
@@ -402,21 +432,32 @@ def print_actions_and_states(node):
 ## Main
 
 def main():
+	
 	global cityMap
-	# For debugging
-	print(sys.argv) # Prints the command line arguments. Note that the 0th element is the name of the file (search.py).
 
 	# Take input
 	arg1 = sys.argv[1] # Options are "eight", "boston", and "london"
 	algorithm = sys.argv[2] # Options are "dfs", "bfs", ucs, and "astar"
 	initial = sys.argv[3] # Either the starting subway stop, or the starting position of the number tiles
 
+	if algorithm == "bfs":
+		algorithm = breadth_first_search
+	elif algorithm == "dfs":
+		algorithm = depth_first_search
+	elif algorithm == "ucs":
+		algorithm = uniform_cost_search
+	elif algorithm == "astar":
+		algorithm = astar_search
+	else:
+		print(f"Unrecognized algorithm: {algorithm}")
+
 	if arg1 == "eight":
-		# Prepare the eight number puzzle
 
 		# Prepare problem
 		problem = puzzle_problem(initial)
 		output_type = "actions and states"
+		# Compute result
+		result = algorithm(problem)
 
 	else:
 
@@ -431,9 +472,10 @@ def main():
 		
 		initialCity = cityMap.get_station_by_name(initial)
 		goalCity = cityMap.get_station_by_name(goal)
+
 		# Get distance if it was provided
 		if len(sys.argv) > 5:
-			distance = sys.argv[5]
+			distance = float(sys.argv[5])
 		else: 
 			distance = 0
 
@@ -441,19 +483,10 @@ def main():
 		problem = subway_problem(initialCity, goalCity, cityMap)
 		output_type = "states"
 
-	if algorithm == "bfs":
-		print("Running BFS")
-		print_solution(breadth_first_search(problem), output_type)
-	elif algorithm == "dfs":
-		print("Running DFS")
-		print_solution(depth_first_search(problem), output_type)
-	elif algorithm == "ucs":
-		print("Running Uniform Cost Search")
-		print_solution(uniform_cost_search(problem), output_type)
-	elif algorithm == "astar":
-		print("Running A*")
-		print_solution(astar_search(problem), output_type)
-	else:
-		print(f"Unrecognized algorithm: {algorithm}")
+		# Compute results
+		result = smart_search(problem, algorithm, distance)
+
+	# Output results
+	print_solution(result, output_type)
 
 main()
