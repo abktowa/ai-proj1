@@ -95,8 +95,6 @@ class subway_problem(Problem): #Sub-Class of Problem
 		for station in self.subMap.get_stations():
 			distance_to_goal = straight_line_distance(station, self.goal)
 			if distance_to_goal <= d:
-				if station.name == "Fenway":
-					print(str(station)+" has distance "+str(distance_to_goal))
 				yield station
 
 	
