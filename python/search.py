@@ -449,7 +449,7 @@ def main():
 		print("Running DFS")
 		print_solution(depth_first_search(problem), output_type)
 	elif algorithm == "ucs":
-		print("Running Uniformed Cost Search")
+		print("Running Uniform Cost Search")
 		print_solution(uniform_cost_search(problem), output_type)
 	elif algorithm == "astar":
 		print("Running A*")
