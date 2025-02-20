@@ -347,14 +347,25 @@ def astar_search(problem):
 #______________________________________________________________________________
 
 ## Output
-def print_solution(solution):
-	"The paramater is a tuple with the goal Node followed by an integer with the amount of nodes visited"
+def print_solution(solution, output_type):
+	"""
+	Paramaters: 
+	solution. A tuple with the goal Node followed by an integer with the amount of nodes visited
+	output_type. A string containing either "actions", "states" or "actions and states"
+	"""
 	print("Total cost: "+str(solution[0].path_cost))
 	print("Number of search nodes visited: "+str(solution[1]))
 	print("Final path: ")
-	print_path(solution[0])
+	if output_type == "actions":
+		print_actions(solution[0])
+	elif output_type == "states":
+		print_states(solution[0])
+	elif output_type == "actions and states":
+		print_states_and_actions(solution[0])
+	else:
+		print("Unrecognized output type")
 
-def print_path(node):
+def print_states(node):
 	stack = deque()
 
 	while node.parent:
@@ -366,6 +377,28 @@ def print_path(node):
 	while stack:
 		print(stack.pop())
 
+def print_actions(node):
+	stack = deque()
+
+	while node.parent:
+		stack.append(node.action)
+		node = node.parent
+
+	while stack:
+		print(stack.pop())
+
+def print_states_and_actions(node):
+	stack = deque()
+
+	while node.parent:
+		stack.append(node)
+		node = node.parent
+	
+	stack.append(node)
+
+	while stack:
+		current = stack.pop()
+		print(str(current.action)+str(", ")+str(current.state))
 
 ## Main
 
@@ -378,18 +411,19 @@ def main():
 	arg1 = sys.argv[1] # Options are "eight", "boston", and "london"
 	algorithm = sys.argv[2] # Options are "dfs", "bfs", ucs, and "astar"
 	initial = sys.argv[3] # Either the starting subway stop, or the starting position of the number tiles
-	# Take more input
-	goal = sys.argv[4] # the destination subway stop
 
 	if arg1 == "eight":
 		# Prepare the eight number puzzle
 
 		# Prepare problem
 		problem = puzzle_problem(initial)
-		
-		pass
+		output_type = "actions and states"
 
 	else:
+
+		# Take more input
+		goal = sys.argv[4] # the destination subway stop
+
 		# Prepare subway search
 		if arg1 == "boston":
 			cityMap = subway.build_boston_map()
@@ -406,19 +440,20 @@ def main():
 
 		# Prepare problem
 		problem = subway_problem(initialCity, goalCity, cityMap)
+		output_type = "states"
 
 	if algorithm == "bfs":
 		print("Running BFS")
-		print_solution(breadth_first_search(problem))
+		print_solution(breadth_first_search(problem), output_type)
 	elif algorithm == "dfs":
 		print("Running DFS")
-		print_solution(depth_first_search(problem))
+		print_solution(depth_first_search(problem), output_type)
 	elif algorithm == "ucs":
-		print("Running Uniformed Cost Search.")
-		print_solution(uniform_cost_search(problem))
+		print("Running Uniformed Cost Search")
+		print_solution(uniform_cost_search(problem), output_type)
 	elif algorithm == "astar":
 		print("Running A*")
-		print_solution(astar_search(problem))
+		print_solution(astar_search(problem), output_type)
 	else:
 		print(f"Unrecognized algorithm: {algorithm}")
 
