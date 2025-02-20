@@ -361,7 +361,7 @@ def print_solution(solution, output_type):
 	elif output_type == "states":
 		print_states(solution[0])
 	elif output_type == "actions and states":
-		print_states_and_actions(solution[0])
+		print_actions_and_states(solution[0])
 	else:
 		print("Unrecognized output type")
 
@@ -387,7 +387,7 @@ def print_actions(node):
 	while stack:
 		print(stack.pop())
 
-def print_states_and_actions(node):
+def print_actions_and_states(node):
 	stack = deque()
 
 	while node.parent:
