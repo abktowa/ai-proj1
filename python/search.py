@@ -88,7 +88,7 @@ class subway_problem(Problem): #Sub-Class of Problem
 	
 class puzzle_problem(Problem): #Sub-Class of Problem
 	def __init__(self, initial):
-		Problem.__init__(self, initial, "0123456789")
+		Problem.__init__(self, initial, "012345678")
 
 	def successor(self, state):
 		allOptions = []
@@ -104,7 +104,7 @@ class puzzle_problem(Problem): #Sub-Class of Problem
 			allOptions.append(("Move Tile " + state[emptySquare - 1] + " right", emptySquare - 1))
 
 		for i in range(len(allOptions)):
-			allStates.append(allOptions[i][0], self.movePiece(state, emptySquare, allOptions[i][1]))
+			allStates.append((allOptions[i][0], self.movePiece(state, emptySquare, allOptions[i][1])))
 
 		return allStates
 	
@@ -125,7 +125,7 @@ class puzzle_problem(Problem): #Sub-Class of Problem
 		strList = list(newString)
 
 		strList[emptyIndex] = state[moveIndex]
-		strList[moveIndex] = 0
+		strList[moveIndex] = "0"
 
 		return "".join(strList)
 	
@@ -230,7 +230,6 @@ def breadth_first_search(problem):
 					if problem.goal_test(neighbor.state):
 						return (neighbor, nodes_visited)
 					queue.append(neighbor)
-
 	return None
 		
 	
