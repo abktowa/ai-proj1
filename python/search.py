@@ -213,7 +213,7 @@ def breadth_first_search(problem):
 
 	# Check if it's the goal
 	if problem.goal_test(start.state):
-		return (start, nodes_visited+1)
+		return (start, 1)
 	
 	while queue:
 		current = queue.popleft()
@@ -227,8 +227,8 @@ def breadth_first_search(problem):
 			neighbors = current.expand(problem)
 			for neighbor in neighbors:
 				if neighbor.state not in visited:
-					if problem.goal_test(current.state):
-						return (current, nodes_visited)
+					if problem.goal_test(neighbor.state):
+						return (neighbor, nodes_visited)
 					queue.append(neighbor)
 
 	return None
